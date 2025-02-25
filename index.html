@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum Smart Contract Security Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a0a0a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #222;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #47ebeb;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #35cfcf;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: left;
+            overflow-x: auto;
+            max-height: 400px;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+    <script>
+        async function analyzeToken() {
+            const address = document.getElementById("contractAddress").value;
+            const resultElement = document.getElementById("result");
+            
+            if (!address) {
+                alert("Please enter a contract address!");
+                return;
+            }
+
+            resultElement.innerHTML = "<p style='color:gray;'>Analyzing contract...</p>";
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ address })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultElement.innerHTML = `<p class="error">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                resultElement.innerHTML = "<p class='error'>Server error. Please try again.</p>";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Ethereum Smart Contract Security Analyzer</h1>
+    <p>Enter an Ethereum contract address below to check for security vulnerabilities.</p>
+    
+    <input type="text" id="contractAddress" placeholder="Enter Ethereum Contract Address">
+    <button onclick="analyzeToken()">Analyze</button>
+    
+    <div id="result"></div>
+</body>
+</html>
